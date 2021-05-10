@@ -33,13 +33,6 @@ var (
 )
 
 func main() {
-	if len(os.Args) == 1 {
-		getConfig()
-		if config.Token != "" {
-			flag.PrintDefaults()
-		}
-		os.Exit(0)
-	}
 	userConfig, err := os.UserConfigDir()
 	if err != nil {
 		fmt.Printf("Couldn't get user config path, %v\n", err)
@@ -60,6 +53,13 @@ func main() {
 	sha := pushCommand.String("sha", "", "Use specified sha")
 	message := pushCommand.String("m", "", "Use specified message")
 
+	if len(os.Args) == 1 {
+		getConfig()
+		pushCommand.Usage()
+		configCommand.Usage()
+		os.Exit(0)
+	}
+
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "config":
@@ -76,8 +76,10 @@ func main() {
 				os.Exit(1)
 			}
 			pushCommand.Parse(os.Args[2:])
-		default:
-			flag.Usage()
+		case "help":
+			pushCommand.Usage()
+			configCommand.Usage()
+			os.Exit(0)
 		}
 	}
 
@@ -172,8 +174,6 @@ func main() {
 		fmt.Println("success")
 		os.Exit(0)
 	}
-	flag.Parse()
-	flag.Usage()
 	os.Exit(1)
 }
 
