@@ -105,6 +105,7 @@ func main() {
 
 	if pushCommand.Parsed() {
 		getConfig()
+		fileName := os.Args[len(os.Args)-1]
 		var requestBody requestFormat
 		if *customRepo != "" {
 			config.Repo = *customRepo
@@ -128,15 +129,14 @@ func main() {
 			requestBody.Path = *remotePath
 		} else {
 			fmt.Println("Path not provided, using default directory...")
-			requestBody.Path = fmt.Sprintf("%s/%s", config.DefaultPath, os.Args[len(os.Args)-1])
+			requestBody.Path = fmt.Sprintf("%s%s", config.DefaultPath, os.Args[len(os.Args)-1])
 		}
 		if *message == "" {
-			fmt.Println("message not provided\nExiting...")
-			os.Exit(1)
+			fmt.Println("Message not provided. Using ", fileName)
+			*message = fileName
 		}
 
 		requestBody.M = *message
-		fileName := os.Args[len(os.Args)-1]
 
 		fileContent, err := ioutil.ReadFile(fileName)
 		if err != nil {
@@ -217,7 +217,7 @@ func firstTime(filePath string) {
 	fmt.Scan(&config.Token)
 	fmt.Printf("Default branch to use: ")
 	fmt.Scan(&config.DefaultBranch)
-	fmt.Printf("Default directory to use: ")
+	fmt.Printf("Default directory to use (For root use '/'): ")
 	fmt.Scan(&config.DefaultPath)
 
 	saveConfig(filePath)
